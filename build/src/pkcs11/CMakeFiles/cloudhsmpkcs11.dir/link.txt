@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc libcloudhsmpkcs11.a  CMakeFiles/cloudhsmpkcs11.dir/common.c.o CMakeFiles/cloudhsmpkcs11.dir/pkcs11.c.o CMakeFiles/cloudhsmpkcs11.dir/ec_sign.c.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib libcloudhsmpkcs11.a

@@ -1,0 +1,47 @@
+version: 2.1
+
+executors:
+  default:
+    machine: true
+    environment:
+      IMAGE_NAME: cryptogarageinc/cloudhsm-go
+
+references:
+  commands:
+    docker_cache_key_path: &docker_image_cache_key_path
+      key: docker-image-{{ .Branch }}-{{ .Revision }}
+      paths:
+        - /tmp/cache
+
+jobs:
+  build:
+    executor: default
+    steps:
+      - checkout
+      - run: docker build . -t $IMAGE_NAME
+      - run: |
+          mkdir -p /tmp/cache
+          docker save -o /tmp/cache/image.tar $IMAGE_NAME $(docker history -q $IMAGE_NAME | tail -n +2 | grep -v \<missing\> | tr '\n' ' ')
+      - save_cache: *docker_image_cache_key_path
+
+  deploy_to_registory:
+    executor: default
+    steps:
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+      - restore_cache: *docker_image_cache_key_path
+      - run: docker load -i /tmp/cache/image.tar
+      - run: docker tag $IMAGE_NAME $IMAGE_NAME:latest
+      - run: docker push $IMAGE_NAME:latest
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+      - deploy_to_registory:
+          filters:
+            branches:
+              only:
+                - feature/swig_go_dev_1
+          requires:
+            - build

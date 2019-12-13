@@ -1,0 +1,50 @@
+name: pre-merge check
+
+on: 
+  push:
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  cmake-build:
+    name: cmake build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        go-version: [1.12.x, 1.13.x]
+
+    steps:
+    - name: setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - uses: actions/checkout@v1
+    - name: apt-install
+      if: matrix.os == 'ubuntu-latest'
+      run: sudo apt install libssl-dev
+    - name: cmake_version
+      run: cmake --version
+    - name: cmake-windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        cmake -S . -B build -G "MSYS Makefiles"
+        run: cmake --build build --config Release
+    - name: cmake
+      if: matrix.os != 'windows-latest'
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
+        make
+        cd ..
+    - name: go_test-windows
+      if: matrix.os == 'windows-latest'
+      run: .\go_test.bat
+    - name: go_test-macos
+      if: matrix.os != 'windows-latest'
+      run: ./go_test.sh

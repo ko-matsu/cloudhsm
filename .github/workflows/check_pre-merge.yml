@@ -29,7 +29,7 @@ jobs:
     - name: cmake-get
       if: matrix.os == 'ubuntu-latest' && steps.cache.outputs.cache-hit != 'true'
       run: |
-        sudo mkdir $GITHUB_WORKSPACE/cache/cmake
+        sudo mkdir -p $GITHUB_WORKSPACE/cache/cmake
         sudo chmod 777 $GITHUB_WORKSPACE/cache/cmake
         sudo chown runner $GITHUB_WORKSPACE/cache/cmake
         cd $GITHUB_WORKSPACE/cache/cmake

@@ -49,8 +49,7 @@ jobs:
       run: |
         sudo apt install opensc-pkcs11
         export CURRENT_DIR=$(pwd)
-        export PATH="$PATH:$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin"
-        env
+        export PATH="$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin:$PATH"
     - name: cmake_version
       run: cmake --version
     - name: cmake

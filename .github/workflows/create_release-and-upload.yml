@@ -102,7 +102,6 @@ jobs:
         sudo zip -r /tmp/cloudhsm/cloudhsm.zip usr
         sudo chmod 777 /tmp/cloudhsm/cloudhsm.zip
         sudo chown runner /tmp/cloudhsm/cloudhsm.zip
-        sudo cp -rp /tmp/cloudhsm/cloudhsm.zip $GITHUB_WORKSPACE/dist/cloudhsm.zip
         echo "---- dump zip file ----"
         sudo ls -l /tmp/cloudhsm
     - name: Create Release

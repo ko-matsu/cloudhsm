@@ -55,10 +55,10 @@ jobs:
           - Second Change
         draft: false
         prerelease: false
-      continue-on-error: true
+#      continue-on-error: true
     - name: Upload Release Asset
       id: upload-release-asset 
-      if: success()
+#      if: success()
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -67,9 +67,21 @@ jobs:
         asset_path: /tmp/cloudhsm/cloudhsm.zip
         asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-alpine_x86_64.zip
         asset_content_type: application/zip
+    - name: write upload url
+      env:
+        url: ${{ steps.create_release.outputs.upload_url }}
+      run: |
+        cd /tmp/cloudhsm
+        sudo echo $url > upload_url.txt
+    - name: upload artifact
+      uses: actions/upload-artifact@v1
+      with:
+        name: artifact-upload_url
+        path: /tmp/cloudhsm/upload_url.txt
 
   upload-object-macos-static:
     name: upload-object-macos
+    needs: upload-object-alpine
     runs-on: macos-latest
 
     steps:
@@ -104,29 +116,22 @@ jobs:
         sudo chown runner /tmp/cloudhsm/cloudhsm.zip
         echo "---- dump zip file ----"
         sudo ls -l /tmp/cloudhsm
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: download artifact
+      uses: actions/download-artifact@v1
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          Changes in this Release
-          - First Change
-          - Second Change
-        draft: false
-        prerelease: false
-      continue-on-error: true
+        name: artifact-upload_url
+    - name: dump upload url
+      id: get_url
+      run: |
+        url=$(cat upload_url.txt)
+        echo ::set-output name=upload_url::$url
     - name: Upload Release Asset
       id: upload-release-asset 
-      if: success()
       uses: actions/upload-release-asset@v1.0.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ steps.get_url.outputs.upload_url }}
         asset_path: /tmp/cloudhsm/cloudhsm.zip
         asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-darwin-static_x86_64.zip
         asset_content_type: application/zip

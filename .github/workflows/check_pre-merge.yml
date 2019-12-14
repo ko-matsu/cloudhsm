@@ -54,7 +54,9 @@ jobs:
         export CURRENT_DIR=$(pwd)
         export PATH="$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin:$PATH"
     - name: cmake_version
-      run: cmake --version
+      run: |
+        env
+        cmake --version
     - name: cmake
       run: |
         mkdir build

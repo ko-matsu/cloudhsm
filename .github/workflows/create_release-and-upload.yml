@@ -123,7 +123,7 @@ jobs:
     - name: dump upload url
       id: get_url
       run: |
-        url=$(cat upload_url.txt)
+        url=$(cat artifact-upload_url/upload_url.txt)
         echo ::set-output name=upload_url::$url
     - name: Upload Release Asset
       id: upload-release-asset 

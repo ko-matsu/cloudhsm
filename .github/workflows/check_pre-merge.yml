@@ -58,3 +58,5 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
         make
         cd ..
+    - name: go build
+      run: go build

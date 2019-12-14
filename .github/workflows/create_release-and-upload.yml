@@ -78,20 +78,26 @@ jobs:
     - name: Get the version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: create folder
+      run: |
+        echo "---- dump output data ----"
+        mkdir -p /tmp/cloudhsm/usr/local/lib
+        sudo chmod 777 /tmp/cloudhsm
+        sudo chown runner /tmp/cloudhsm
+        sudo chmod 777 /tmp/cloudhsm/usr
+        sudo chown runner /tmp/cloudhsm/usr
+        sudo mkdir -p /tmp/cloudhsm/usr/local/lib
+        sudo chmod 777 /tmp/cloudhsm/usr/local/lib
+        sudo chown runner /tmp/cloudhsm/usr/local/lib
     - name: cmake-build
       run: |
         mkdir build
         cd build
         cmake .. -DENABLE_SHARED=off -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
         make
-        pwd
-        cd ..
+        sudo cp -rp ./src/pkcs11/libcloudhsmpkcs11.* /tmp/cloudhsm/usr/local/lib
     - name: create archive file
       run: |
-        echo "---- dump output data ----"
-        mkdir -p /tmp/cloudhsm
-        sudo chmod 777 /tmp/cloudhsm
-        sudo chown runner /tmp/cloudhsm
         cd /tmp/cloudhsm
         sudo zip -r /tmp/cloudhsm/cloudhsm.zip usr
         sudo chmod 777 /tmp/cloudhsm/cloudhsm.zip

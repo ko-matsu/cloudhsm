@@ -12,7 +12,7 @@ cd build
 cmake --version
 cmake .. -DENABLE_SHARED=on -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
 make
-cp ./Release/libcloudhsm.* /github/workspace/dist/usr/local/lib64
+cp ./src/pkcs11/libcloudhsmpkcs11.* /github/workspace/dist/usr/local/lib64
 ls /github/workspace/dist
 ls /github/workspace/dist/usr
 ls /github/workspace/dist/usr/local

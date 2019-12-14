@@ -51,14 +51,11 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt install opensc-pkcs11
-        export CURRENT_DIR=$(pwd)
-        export PATH="$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin:$PATH"
-    - name: cmake_version
-      run: |
-        env
-        cmake --version
     - name: cmake
       run: |
+        export CURRENT_DIR=$(pwd)
+        export PATH="$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin:$PATH"
+        cmake --version
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"

@@ -15,36 +15,46 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]
         go-version: [1.12.x, 1.13.x]
 
     steps:
+    - name: cmake-cache-ubuntu
+      if: matrix.os == 'ubuntu-latest'
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: $GITHUB_WORKSPACE/cache/cmake
+        key: ${{ runner.os }}-cmake-3.15.5-x64
+    - name: cmake-get
+      if: matrix.os == 'ubuntu-latest' && steps.cache.outputs.cache-hit != 'true'
+      run: |
+        sudo mkdir $GITHUB_WORKSPACE/cache/cmake
+        sudo chmod 777 $GITHUB_WORKSPACE/cache/cmake
+        sudo chown runner $GITHUB_WORKSPACE/cache/cmake
+        cd $GITHUB_WORKSPACE/cache/cmake
+        sudo wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
     - name: setup go
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@v1
-    - name: apt-install
+    - name: cmake-get
       if: matrix.os == 'ubuntu-latest'
-      run: sudo apt install libssl-dev
+      run: |
+        cd $GITHUB_WORKSPACE/cache/cmake
+        sudo tar zxvf cmake-3.15.5-Linux-x86_64.tar.gz
+    - name: ubuntu-install
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt install opensc-pkcs11
+        export PATH="$PATH:$GITHUB_WORKSPACE/cache/cmake/cmake-3.15.5-Linux-x86_64/bin"
     - name: cmake_version
       run: cmake --version
-    - name: cmake-windows
-      if: matrix.os == 'windows-latest'
-      run: |
-        cmake -S . -B build -G "MSYS Makefiles"
-        run: cmake --build build --config Release
     - name: cmake
-      if: matrix.os != 'windows-latest'
       run: |
         mkdir build
         cd build
         cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
         make
         cd ..
-    - name: go_test-windows
-      if: matrix.os == 'windows-latest'
-      run: .\go_test.bat
-    - name: go_test-macos
-      if: matrix.os != 'windows-latest'
-      run: ./go_test.sh

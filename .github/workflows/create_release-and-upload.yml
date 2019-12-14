@@ -6,8 +6,8 @@ on:
     - 'v*'
 
 jobs:
-  docker-build:
-    name: docker-build
+  upload-object-alpine:
+    name: upload-object-alpine
     runs-on: ubuntu-latest
 
     steps:
@@ -66,4 +66,64 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: /tmp/cloudhsm/cloudhsm.zip
         asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-alpine_x86_64.zip
+        asset_content_type: application/zip
+
+  upload-object-macos-static:
+    name: upload-object-macos
+    runs-on: macos-latest
+
+    steps:
+    - name: checkout
+      uses: actions/checkout@v1
+    - name: Get the version
+      id: get_version
+      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: create directory
+      run: |
+        mkdir -p /tmp/cloudhsm
+        sudo chmod 777 /tmp/cloudhsm
+        sudo chown runner /tmp/cloudhsm
+    - name: cmake-build
+      run: |
+        mkdir build
+        cd build
+        cmake .. -DENABLE_SHARED=off -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
+        make
+        sudo make install DESTDIR=/tmp/cloudhsm
+        cd ..
+    - name: create archive file
+      run: |
+        echo "---- dump output data ----"
+        cd /tmp/cloudhsm
+        sudo zip -r /tmp/cloudhsm/cloudhsm.zip usr
+        sudo chmod 777 /tmp/cloudhsm/cloudhsm.zip
+        sudo chown runner /tmp/cloudhsm/cloudhsm.zip
+        sudo cp -rp /tmp/cloudhsm/cloudhsm.zip $GITHUB_WORKSPACE/dist/cloudhsm.zip
+        echo "---- dump zip file ----"
+        sudo ls -l /tmp/cloudhsm
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - First Change
+          - Second Change
+        draft: false
+        prerelease: false
+      continue-on-error: true
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      if: success()
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: /tmp/cloudhsm/cloudhsm.zip
+        asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-darwin-static_x86_64.zip
         asset_content_type: application/zip

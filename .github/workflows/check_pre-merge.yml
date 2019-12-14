@@ -39,7 +39,7 @@ jobs:
         sudo chown runner $GITHUB_WORKSPACE/cache/cmake
         cd $GITHUB_WORKSPACE/cache/cmake
         sudo wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
-    - name: cmake-get
+    - name: cmake-setting
       if: matrix.os == 'ubuntu-latest'
       run: |
         cd $GITHUB_WORKSPACE/cache/cmake

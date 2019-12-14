@@ -29,26 +29,26 @@ jobs:
       uses: actions/cache@v1
       id: cache
       with:
-        path: $GITHUB_WORKSPACE/cache/cmake
+        path: cache/cmake
         key: ${{ runner.os }}-cmake-3.15.5-x64
     - name: cmake-get
       if: matrix.os == 'ubuntu-latest' && steps.cache.outputs.cache-hit != 'true'
       run: |
-        sudo mkdir -p $GITHUB_WORKSPACE/cache/cmake
-        sudo chmod 777 $GITHUB_WORKSPACE/cache/cmake
-        sudo chown runner $GITHUB_WORKSPACE/cache/cmake
-        cd $GITHUB_WORKSPACE/cache/cmake
-        sudo wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
+        mkdir -p cache/cmake
+        cd cache/cmake
+        wget https://github.com/Kitware/CMake/releases/download/v3.15.5/cmake-3.15.5-Linux-x86_64.tar.gz
+        cd ../..
     - name: cmake-setting
       if: matrix.os == 'ubuntu-latest'
       run: |
-        cd $GITHUB_WORKSPACE/cache/cmake
+        cd cache/cmake
         sudo tar zxvf cmake-3.15.5-Linux-x86_64.tar.gz
+        cd ../..
     - name: ubuntu-install
       if: matrix.os == 'ubuntu-latest'
       run: |
         sudo apt install opensc-pkcs11
-        export PATH="$PATH:$GITHUB_WORKSPACE/cache/cmake/cmake-3.15.5-Linux-x86_64/bin"
+        export PATH="$PATH:$pwd/cache/cmake/cmake-3.15.5-Linux-x86_64/bin"
     - name: cmake_version
       run: cmake --version
     - name: cmake

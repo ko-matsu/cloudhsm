@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project(aws-cloudhsm-pkcs11-examples)
 
 SET(ORGANIZATION_NAME "Crypto Garage, Inc.")
 SET(CMAKE_C_FLAGS "-Wall -Werror -Wno-pointer-sign -fno-signed-char -std=c99")
 
-ENABLE_TESTING()
+# ENABLE_TESTING()
 
 include_directories(include/pkcs11/v2.40)
 include_directories(src/pkcs11)

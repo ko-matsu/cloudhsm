@@ -1,0 +1,42 @@
+name: pre-merge check
+
+on: 
+  push:
+    branches:
+    - master
+    - feature/*
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  cmake-build:
+    name: cmake build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest]
+        go-version: [1.12.x, 1.13.x]
+
+    steps:
+    - name: setup go
+      uses: actions/setup-go@v1
+      with:
+        go-version: ${{ matrix.go-version }}
+    - uses: actions/checkout@v1
+    - name: ubuntu-install
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt install opensc-pkcs11
+    - name: cmake
+      run: |
+        export CURRENT_DIR=$(pwd)
+        export PATH="$CURRENT_DIR/cache/cmake/cmake-3.15.5-Linux-x86_64/bin:$PATH"
+        cmake --version
+        mkdir build
+        cd build
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
+        make
+        cd ..
+    - name: go build
+      run: go build

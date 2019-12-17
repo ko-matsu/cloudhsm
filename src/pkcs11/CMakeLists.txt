@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.12)
 option(ENABLE_SHARED "enable shared library (ON or OFF. default:OFF)" OFF)
 if(NOT WIN32)
 set(TARGET_RPATH "" CACHE STRING "target rpath list (separator is ';') (default:)")

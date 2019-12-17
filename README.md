@@ -30,7 +30,7 @@ mkdir build
 cd build
 cmake .. -D ENABLE_SHARED=on
 make
-cp src/pkcs11/libcloudhsmpkcs11.dylib /usr/local/lib/
+cp Release/libcloudhsmpkcs11.dylib /usr/local/lib/
 cd ../../
 mkdir cloudsign
 cd cloudsign

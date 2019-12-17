@@ -107,7 +107,7 @@ jobs:
         cd build
         cmake .. -DENABLE_SHARED=off -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib;/usr/local/lib64"
         make
-        sudo cp -rp ./src/pkcs11/libcloudhsmpkcs11.* /tmp/cloudhsm/usr/local/lib
+        sudo cp -rp ./Release/libcloudhsmpkcs11.* /tmp/cloudhsm/usr/local/lib
     - name: create archive file
       run: |
         cd /tmp/cloudhsm

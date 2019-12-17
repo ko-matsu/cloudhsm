@@ -30,7 +30,7 @@ typedef struct { void* array; intgo len; intgo cap; } _goslice_;
 
 
 #cgo CPPFLAGS: -I${SRCDIR}/include/pkcs11/v2.40
-#cgo LDFLAGS: -L${SRCDIR}/build/src/pkcs11 -lcloudhsmpkcs11 -ldl
+#cgo LDFLAGS: -L${SRCDIR}/build/Release -L/usr/local/lib -L/usr/local/lib64 -lcloudhsmpkcs11 -ldl
 
 typedef _gostring_ swig_type_1;
 typedef _gostring_ swig_type_2;

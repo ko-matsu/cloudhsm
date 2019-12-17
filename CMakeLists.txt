@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.13)
 project(aws-cloudhsm-pkcs11-examples)
 
 SET(ORGANIZATION_NAME "Crypto Garage, Inc.")

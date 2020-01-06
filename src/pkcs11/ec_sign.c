@@ -36,7 +36,7 @@ CK_RV generate_signature(CK_SESSION_HANDLE session,
     rv = funcs->C_SignInit(session, &mech, key);
     if (rv != CKR_OK)
     {
-        return !CKR_OK;
+        return rv;
     }
 
     rv = funcs->C_Sign(session, data, data_length, signature, signature_length);
@@ -61,7 +61,7 @@ CK_RV verify_signature(CK_SESSION_HANDLE session,
     rv = funcs->C_VerifyInit(session, &mech, key);
     if (rv != CKR_OK)
     {
-        return !CKR_OK;
+        return rv;
     }
 
     rv = funcs->C_Verify(session, data, data_length, signature, signature_length);

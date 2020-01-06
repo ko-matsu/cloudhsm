@@ -11,31 +11,43 @@
 %include "src/pkcs11/sign.h"
 %go_import("unsafe")
 %insert(go_wrapper) %{
-func convertRVtoByte(rv CK_RV) byte {
-        return *(*byte)(unsafe.Pointer(rv.Swigcptr()))
+func convertRVtoByte(rv CK_RV) uint64 {
+        return *(*uint64)(unsafe.Pointer(rv.Swigcptr()))
 }
 
-func Pkcs11Initialize(path string) byte {
+func Pkcs11Initialize(path string) uint64 {
         rv := Pkcs11_initialize(path)
         return convertRVtoByte(rv)
 }
 
-func Pkcs11OpenSession(pin string) (sessionHandler SwigcptrCK_SESSION_HANDLE, ret byte) {
+func Pkcs11OpenSession(pin string) (sessionHandler uint64, ret uint64) {
         pinPtr := SwigcptrCK_UTF8CHAR_PTR(uintptr(unsafe.Pointer(&pin)))
         session := uint64(0)
-        sessionHandler = SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
-        sessionPtr := SwigcptrCK_SESSION_HANDLE_PTR(uintptr(unsafe.Pointer(&sessionHandler)))
+        sessionHandlePtr := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
+        sessionPtr := SwigcptrCK_SESSION_HANDLE_PTR(uintptr(unsafe.Pointer(&sessionHandlePtr)))
 
         rv := Pkcs11_open_session(pinPtr, sessionPtr)
         ret = convertRVtoByte(rv)
+        if ret == uint64(0) {
+                sessionHandler = session
+        }
         return
 }
 
-func Pkcs11FinalizeSession(session CK_SESSION_HANDLE) {
-        Pkcs11_finalize_session(session)
+func Pkcs11FinalizeSession(session uint64) {
+        if session == uint64(0) {
+                // for disable Go-Compiler optimization
+                sessionObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
+                Pkcs11_finalize_session(sessionObj)
+        } else {
+                sessionObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
+                Pkcs11_finalize_session(sessionObj)
+        }
+        return
 }
 
-func GenerateSignature(sessionHandle CK_SESSION_HANDLE, privkey uint64, mechType uint64, data []byte) (signature [64]byte, ret byte) {
+func GenerateSignature(sessionHandle uint64, privkey uint64, mechType uint64, data []byte) (signature [64]byte, ret uint64) {
+        sessionHandleObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&sessionHandle)))
         privkeyObj := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&privkey)))
         mechTypeObj := SwigcptrCK_MECHANISM_TYPE(uintptr(unsafe.Pointer(&mechType)))
 
@@ -53,8 +65,8 @@ func GenerateSignature(sessionHandle CK_SESSION_HANDLE, privkey uint64, mechType
         sigLen := uintptr(unsafe.Pointer(&written))
         sigLenPtrObj := SwigcptrCK_ULONG_PTR(uintptr(unsafe.Pointer(&sigLen)))
 
-         rv := Generate_signature(
-                sessionHandle,
+        rv := Generate_signature(
+                sessionHandleObj,
                 privkeyObj,
                 mechTypeObj,
                 dataObj,
@@ -66,7 +78,8 @@ func GenerateSignature(sessionHandle CK_SESSION_HANDLE, privkey uint64, mechType
         return
 }
 
-func VerifySignature(sessionHandle CK_SESSION_HANDLE, pubkey uint64, mechType uint64, data []byte, signature []byte) byte {
+func VerifySignature(sessionHandle uint64, pubkey uint64, mechType uint64, data []byte, signature []byte) uint64 {
+        sessionHandleObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&sessionHandle)))
         pubkeyObj := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&pubkey)))
         mechTypeObj := SwigcptrCK_MECHANISM_TYPE(uintptr(unsafe.Pointer(&mechType)))
 
@@ -83,7 +96,7 @@ func VerifySignature(sessionHandle CK_SESSION_HANDLE, pubkey uint64, mechType ui
         sigLenObj := SwigcptrCK_ULONG(uintptr(unsafe.Pointer(&sigLen)))
 
         rv := Verify_signature(
-                sessionHandle,
+                sessionHandleObj,
                 pubkeyObj,
                 mechTypeObj,
                 dataObj,

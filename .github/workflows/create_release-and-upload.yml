@@ -67,14 +67,3 @@ jobs:
         asset_path: /tmp/cloudhsm/cloudhsm.zip
         asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-alpine_x86_64.zip
         asset_content_type: application/zip
-    - name: write upload url
-      env:
-        url: ${{ steps.create_release.outputs.upload_url }}
-      run: |
-        cd /tmp/cloudhsm
-        sudo echo $url > upload_url.txt
-    - name: upload artifact
-      uses: actions/upload-artifact@v1
-      with:
-        name: artifact-upload_url
-        path: /tmp/cloudhsm/upload_url.txt

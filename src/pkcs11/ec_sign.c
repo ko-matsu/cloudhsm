@@ -200,7 +200,7 @@ CK_RV get_ec_pubkey(CK_SESSION_HANDLE session,
     }
     buffer_size = *pubkey_length;
 
-    rv = attributes_get(session, key, CKA_PUBLIC_EXPONENT, NULL, &size);
+    rv = attributes_get(session, key, CKA_VALUE, NULL, &size);
     if (rv != CKR_OK)
     {
         // printf("attributes_get failed: %lu\n", rv);
@@ -220,7 +220,7 @@ CK_RV get_ec_pubkey(CK_SESSION_HANDLE session,
     }
 
     memset(buffer, 0, size);
-    rv = attributes_get(session, key, CKA_PUBLIC_EXPONENT, buffer, &size);
+    rv = attributes_get(session, key, CKA_VALUE, buffer, &size);
     if (rv == CKR_OK)
     {
         memcpy(pubkey, buffer, size);

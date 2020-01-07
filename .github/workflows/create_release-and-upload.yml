@@ -5,6 +5,9 @@ on:
     tags:
     - 'v*'
 
+env:
+  CMAKE_VERSION: 3.15.5
+
 jobs:
   upload-object-alpine:
     name: upload-object-alpine
@@ -67,3 +70,60 @@ jobs:
         asset_path: /tmp/cloudhsm/cloudhsm.zip
         asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-alpine_x86_64.zip
         asset_content_type: application/zip
+    - name: cmake-useCache-ubuntu
+      uses: actions/cache@v1
+      id: cache
+      with:
+        path: cache/cmake
+        key: ${{ runner.os }}-cmake-3.15.5-x64
+    - name: cmake-download-ubuntu
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p cache/cmake
+        cd cache/cmake
+        wget https://github.com/Kitware/CMake/releases/download/v$CMAKE_VERSION/cmake-$CMAKE_VERSION-Linux-x86_64.tar.gz
+        cd ../..
+    - name: cmake-setting-ubuntu
+      run: |
+        export cmake_file_name="cmake-$CMAKE_VERSION-Linux-x86_64"
+        cd cache/cmake
+        tar zxvf $cmake_file_name.tar.gz
+        chmod +x $cmake_file_name/bin/cmake $cmake_file_name/bin/ctest
+        export CURRENT_DIR=$(pwd)
+        echo ::add-path::$CURRENT_DIR/$cmake_file_name/bin
+        cd ../..
+    - name: cmake-build
+      id: cmake_build
+      run: |
+        sudo rm -rf build
+        mkdir build
+        cd build
+        cmake .. -DENABLE_SHARED=on -DCMAKE_BUILD_TYPE=Release -DTARGET_RPATH="/usr/local/lib"
+        make
+        cd ..
+        export CURRENT_DIR=$(pwd)
+        echo ::set-output name=CURRENT_DIR::$CURRENT_DIR
+    - name: cmake-install
+      run: |
+        sudo rm -rf dist
+        mkdir dist
+        cd build
+        make install DESTDIR=../dist
+        cd ..
+    - name: create archive file Ubuntu
+      run: |
+        cd dist
+        zip -r cloudhsm.zip usr
+        echo "---- dump zip file ----"
+        ls -l
+    - name: Upload Release Asset Ubuntu
+      uses: actions/upload-release-asset@v1.0.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./dist/cloudhsm.zip
+        asset_name: cloudhsm-${{ steps.get_version.outputs.VERSION }}-ubuntu1804-gcc-x86_64.zip
+        asset_content_type: application/zip
+    - name: ubuntu-after
+      run: rm -rf cache/cmake/cmake-$CMAKE_VERSION-Linux-x86_64

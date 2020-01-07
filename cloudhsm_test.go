@@ -29,5 +29,9 @@ func TestSigning(t *testing.T) {
 	ret = VerifySignature(sessionHandle, pubkey, mechType, data[:], signature[:])
 	assert.Equal(t, ok, ret)
 
+	pubkeyBytes, ret := GetPubkey(sessionHandle, pubkey)
+	assert.Equal(t, ok, ret)
+	assert.NotEqual(t, 0, len(pubkeyBytes))
+
 	Pkcs11FinalizeSession(sessionHandle)
 }

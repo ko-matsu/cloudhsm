@@ -25,6 +25,12 @@ CK_RV verify_signature(CK_SESSION_HANDLE session,
                        CK_BYTE_PTR signature,
                        CK_ULONG signature_length);
 
+// ADD
+CK_RV get_ec_pubkey(CK_SESSION_HANDLE session,
+                    CK_OBJECT_HANDLE key,
+                    CK_BYTE_PTR pubkey,
+                    CK_ULONG_PTR pubkey_length);
+
 #ifdef __cplusplus
 }
 #endif

@@ -15,6 +15,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 #include "sign.h"
+#include "attributes.h"
 
 #define MAX_SIGNATURE_LENGTH 256
 
@@ -172,3 +173,62 @@ CK_RV ec_main(CK_SESSION_HANDLE session)
 
     return 0;
 }
+
+#define MAX_PUBKEY_LENGTH 256
+
+/**
+ * Get an EC pubkey.
+ * @param session Valid PKCS11 session.
+ * @param key Pointer where the public key handle will be stored.
+ * @param pubkey Pointer where the public key byte array.
+ * @param pubkey_length public key byte array length.
+ * @return CK_RV Value returned by the PKCS#11 library. This will indicate success or failure.
+ */
+CK_RV get_ec_pubkey(CK_SESSION_HANDLE session,
+                    CK_OBJECT_HANDLE key,
+                    CK_BYTE_PTR pubkey,
+                    CK_ULONG_PTR pubkey_length)
+{
+    CK_RV rv;
+    size_t size = 0;
+    uint8_t *buffer = NULL;
+    size_t buffer_size = 0;
+
+    if ((pubkey == NULL) || (pubkey_length == NULL))
+    {
+        return CKR_GENERAL_ERROR;
+    }
+    buffer_size = *pubkey_length;
+
+    rv = attributes_get(session, key, CKA_EC_POINT, NULL, &size);
+    if (rv != CKR_OK)
+    {
+        // printf("attributes_get failed: %lu\n", rv);
+        return rv;
+    }
+
+    if (buffer_size < size)
+    {
+        printf("pubkey_length size low: %lu\n", size);
+        return CKR_ARGUMENTS_BAD;
+    }
+
+    buffer = (uint8_t *)malloc(size);
+    if (buffer == NULL)
+    {
+        return CKR_HOST_MEMORY;
+    }
+
+    memset(buffer, 0, size);
+    rv = attributes_get(session, key, CKA_EC_POINT, buffer, &size);
+    if (rv == CKR_OK)
+    {
+        memcpy(pubkey, buffer, size);
+        *pubkey_length = (CK_ULONG)size;
+    }
+    memset(buffer, 0, size);
+    free(buffer);
+
+    return rv;
+}
+

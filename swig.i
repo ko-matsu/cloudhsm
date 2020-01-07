@@ -105,4 +105,29 @@ func VerifySignature(sessionHandle uint64, pubkey uint64, mechType uint64, data 
                 sigLenObj)
         return convertRVtoByte(rv)
 }
+
+func GetPubkey(sessionHandle uint64, pubkey uint64) (pubkeyBytes []byte, ret uint64) {
+        sessionHandleObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&sessionHandle)))
+        pubkeyObj := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&pubkey)))
+
+        var data [256]byte
+        dataPtr := uintptr(unsafe.Pointer(&data[0]))
+        dataObj := SwigcptrCK_BYTE_PTR(uintptr(unsafe.Pointer(&dataPtr)))
+
+        written := uint64(256)
+        dataLen := uintptr(unsafe.Pointer(&written))
+        dataLenPtrObj := SwigcptrCK_ULONG_PTR(uintptr(unsafe.Pointer(&dataLen)))
+
+        rv := Get_ec_pubkey(
+                sessionHandleObj,
+                pubkeyObj,
+                dataObj,
+                dataLenPtrObj)
+
+        ret = convertRVtoByte(rv)
+        if ret == uint64(0) {
+                pubkeyBytes = data[:written]
+        }
+        return
+}
 %}

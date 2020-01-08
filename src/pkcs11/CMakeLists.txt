@@ -33,7 +33,7 @@ endif()
 ####################
 # project setting
 ####################
-project(cloudhsmpkcs11 C)
+project(cloudhsmpkcs11util C)
 
 if(ENABLE_SHARED)
 add_library(${PROJECT_NAME} SHARED)

@@ -5,7 +5,7 @@
 %}
 %insert(cgo_comment_typedefs) %{
 #cgo CPPFLAGS: -I${SRCDIR}/include/pkcs11/v2.40
-#cgo LDFLAGS: -L${SRCDIR}/build/Release -L/usr/local/lib -L/usr/local/lib64 -lcloudhsmpkcs11 -ldl
+#cgo LDFLAGS: -L${SRCDIR}/build/Release -L/usr/local/lib -L/usr/local/lib64 -lcloudhsmpkcs11util -ldl
 %}
 %include "src/pkcs11/common.h"
 %include "src/pkcs11/sign.h"

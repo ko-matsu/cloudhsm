@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(aws-cloudhsm-pkcs11-examples)
+project(aws-cloudhsm-pkcs11-utility)
 
 SET(ORGANIZATION_NAME "Crypto Garage, Inc.")
 SET(CMAKE_C_FLAGS "-Wall -Werror -Wno-pointer-sign -fno-signed-char -std=c99")

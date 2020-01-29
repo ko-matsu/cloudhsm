@@ -260,4 +260,36 @@ func GetPubkey(sessionHandle uint64, pubkey uint64) (pubkeyBytes []byte, err err
 	}
 	return
 }
+
+func GenerateKeyPair(sessionHandle uint64, namedCurveOid []byte) (pubkey uint64, privkey uint64, err error) {
+	sessionHandleObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&sessionHandle)))
+
+	dataPtr := uintptr(unsafe.Pointer(&namedCurveOid[0]))
+	dataObj := SwigcptrCK_BYTE_PTR(uintptr(unsafe.Pointer(&dataPtr)))
+
+	dataLen := uint64(len(namedCurveOid))
+	dataLenObj := SwigcptrCK_ULONG(uintptr(unsafe.Pointer(&dataLen)))
+
+	outPubkey := uint64(0)
+	outPubkeyHandlePtr := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&outPubkey)))
+	outPubkeyPtr := SwigcptrCK_OBJECT_HANDLE_PTR(uintptr(unsafe.Pointer(&outPubkeyHandlePtr)))
+
+	outPrivkey := uint64(0)
+	outPrivkeyHandlePtr := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&outPrivkey)))
+	outPrivkeyPtr := SwigcptrCK_OBJECT_HANDLE_PTR(uintptr(unsafe.Pointer(&outPrivkeyHandlePtr)))
+
+	rv := Generate_ec_keypair(
+		sessionHandleObj,
+		dataObj,
+		dataLenObj,
+		outPubkeyPtr,
+		outPrivkeyPtr)
+
+	err = convertRVtoByte(rv)
+	if err == nil {
+		pubkey = outPubkey
+		privkey = outPrivkey
+	}
+	return
+}
 %}

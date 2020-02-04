@@ -175,6 +175,23 @@ func Pkcs11FinalizeSession(session uint64) {
 	return
 }
 
+func Pkcs11CloseSession(session uint64) {
+	if session == uint64(0) {
+		// for disable Go-Compiler optimization
+		sessionObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
+		Pkcs11_close_session(sessionObj)
+	} else {
+		sessionObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&session)))
+		Pkcs11_close_session(sessionObj)
+	}
+	return
+}
+
+func Pkcs11Finalize() {
+	Pkcs11_finalize()
+	return
+}
+
 func GenerateSignature(sessionHandle uint64, privkey uint64, mechType uint64, data []byte) (signature [64]byte, err error) {
 	sessionHandleObj := SwigcptrCK_SESSION_HANDLE(uintptr(unsafe.Pointer(&sessionHandle)))
 	privkeyObj := SwigcptrCK_OBJECT_HANDLE(uintptr(unsafe.Pointer(&privkey)))

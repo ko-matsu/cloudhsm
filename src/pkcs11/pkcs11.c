@@ -149,3 +149,19 @@ void pkcs11_finalize_session(CK_SESSION_HANDLE session) {
     funcs->C_CloseSession(session);
     funcs->C_Finalize(NULL);
 }
+
+/**
+ * Logout the PKCS#11 session.
+ * @param session
+ */
+void pkcs11_close_session(CK_SESSION_HANDLE session) {
+    funcs->C_Logout(session);
+    funcs->C_CloseSession(session);
+}
+
+/**
+ * Finalize the PKCS#11.
+ */
+void pkcs11_finalize() {
+    funcs->C_Finalize(NULL);
+}

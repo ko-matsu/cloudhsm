@@ -38,5 +38,9 @@ func TestSigning(t *testing.T) {
 	assert.NoError(t, err)
 	assert.NotEqual(t, 0, len(pubkeyBytes))
 
-	Pkcs11FinalizeSession(sessionHandle)
+	// Pkcs11FinalizeSession(sessionHandle)
+
+	Pkcs11CloseSession(sessionHandle)
+
+	Pkcs11Finalize()
 }

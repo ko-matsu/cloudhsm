@@ -36,6 +36,8 @@ CK_RV pkcs11_open_session(const CK_UTF8CHAR_PTR pin, CK_SESSION_HANDLE_PTR sessi
 CK_RV pkcs11_get_slot(CK_SLOT_ID *slot_id);
 
 void pkcs11_finalize_session(CK_SESSION_HANDLE session);
+void pkcs11_close_session(CK_SESSION_HANDLE session);
+void pkcs11_finalize();
 
 struct pkcs_arguments {
     char *pin;

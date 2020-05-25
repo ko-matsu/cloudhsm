@@ -89,11 +89,14 @@ CK_RV generate_ec_keypair(CK_SESSION_HANDLE session,
 
     CK_ATTRIBUTE public_key_template[] = {
         {CKA_VERIFY, &true_val, sizeof(CK_BBOOL)},
-        {CKA_EC_PARAMS, named_curve_oid, named_curve_oid_len}};
+        {CKA_EC_PARAMS, named_curve_oid, named_curve_oid_len},
+        {CKA_TOKEN, &true_val, sizeof(CK_BBOOL)},
+    };
 
     CK_ATTRIBUTE private_key_template[] = {
         {CKA_SIGN, &true_val, sizeof(CK_BBOOL)},
         {CKA_PRIVATE, &true_val, sizeof(CK_BBOOL)},
+        {CKA_TOKEN, &true_val, sizeof(CK_BBOOL)},
     };
 
     rv = funcs->C_GenerateKeyPair(session,

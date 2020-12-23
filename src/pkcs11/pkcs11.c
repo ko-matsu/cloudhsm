@@ -136,6 +136,10 @@ CK_RV pkcs11_open_session(const CK_UTF8CHAR_PTR pin, CK_SESSION_HANDLE_PTR sessi
     }
 
     rv = funcs->C_Login(*session, CKU_USER, pin, strlen(pin));
+    if (rv == CKR_USER_ALREADY_LOGGED_IN) {
+        /* Ignore the error if the session used the cache. */
+        rv = CKR_OK;
+    }
 
     return rv;
 }

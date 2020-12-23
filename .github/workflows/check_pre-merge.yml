@@ -27,7 +27,7 @@ jobs:
         go-version: ${{ matrix.go-version }}
     - uses: actions/checkout@v1
     - name: ubuntu-install
-      if: matrix.os != 'macos-latest'
+      if: runner.os != 'macOS'
       run: |
         sudo apt install opensc-pkcs11
     - name: cmake

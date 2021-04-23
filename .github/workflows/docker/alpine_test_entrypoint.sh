@@ -8,7 +8,7 @@ ls -l /usr/local/*
 ls -l /usr/local/go/bin
 
 env
-cd /github/workspace/cloudhsm
+cd /github/workspace
 LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib64:/usr/local/lib" /usr/local/go/bin/go mod download
 echo "---- go test start ----"
 # LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/lib64:/usr/local/lib" /usr/local/go/bin/go test
